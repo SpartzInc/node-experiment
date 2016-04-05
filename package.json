@@ -1,0 +1,41 @@
+{
+    "name": "@dose/experiment",
+    "version": "1.0.0",
+    "description": "Experiment is a decoration wrapper for our Feature module.",
+    "license": "MIT",
+    "keywords": [
+        "ab testing",
+        "feature"
+    ],
+    "author": {
+        "name": "Matt Stypa",
+        "email": "matt@mattstypa.com",
+        "url": "http://mattstypa.com"
+    },
+    "repository" :
+    {
+        "type": "git",
+        "url": "https://bitbucket.org/spartz/node-experiment.git"
+    },
+    "main": "src/experiment.js",
+    "scripts": {
+        "test": "jest",
+        "test-coverage": "jest --coverage",
+        "lint": "jshint src/*.js tests/*.js",
+        "cs": "jscs src/*.js tests/*.js"
+    },
+    "dependencies": {
+        "feature": "https://bitbucket.org/spartz/node-feature.git"
+    },
+    "devDependencies": {
+        "jest-cli": "0.10.0",
+        "jshint": "2.9.1",
+        "jscs": "2.11.0"
+    },
+    "jest": {
+        "testDirectoryName": "tests",
+        "unmockedModulePathPatterns": [
+            "<rootDir>/node_modules/"
+        ]
+    }
+}
