@@ -3,12 +3,12 @@ jest.mock('@dose/feature');
 
 describe('experiment library', function() {
 
-    var _feature = require('@dose/feature');
-    var _featureCoreMock = {
+    var feature = require('@dose/feature');
+    var featureCoreMock = {
         setFeatures: jest.fn(),
         getVariant: jest.fn()
     };
-    _feature.mockReturnValue(_featureCoreMock);
+    feature.mockReturnValue(featureCoreMock);
 
     var _core = require('../src/core');
 
@@ -64,8 +64,8 @@ describe('experiment library', function() {
     };
 
     beforeEach(function() {
-        _featureCoreMock.setFeatures.mockClear();
-        _featureCoreMock.getVariant.mockClear();
+        featureCoreMock.setFeatures.mockClear();
+        featureCoreMock.getVariant.mockClear();
     });
 
     it('throws an error when configuration is invalid', function() {
@@ -76,7 +76,7 @@ describe('experiment library', function() {
 
     it('sets feature configuration', function() {
         _core.setExperiments(_experimentConfig);
-        expect(_featureCoreMock.setFeatures.mock.calls[0][0]).toEqual({
+        expect(featureCoreMock.setFeatures.mock.calls[0][0]).toEqual({
             experiments: {
                 experimentA: 25,
                 experimentB: 25,
@@ -102,25 +102,25 @@ describe('experiment library', function() {
 
     it('sets feature configuration when experiment configuration is empty', function() {
         _core.setExperiments({});
-        expect(_featureCoreMock.setFeatures.mock.calls[0][0]).toEqual({
+        expect(featureCoreMock.setFeatures.mock.calls[0][0]).toEqual({
             experiments: {}
         });
     });
 
     it('gets variant for current experiment', function() {
-        _featureCoreMock.getVariant.mockReturnValue('experimentA');
+        featureCoreMock.getVariant.mockReturnValue('experimentA');
 
         expect(_core.getVariant('context', 'experimentA')).toEqual('experimentA');
-        expect(_featureCoreMock.getVariant.mock.calls[1]).toEqual([
+        expect(featureCoreMock.getVariant.mock.calls[1]).toEqual([
             'context',
             'experiment.experimentA'
         ]);
     });
 
     it('gets null for experiment that is not current', function() {
-        _featureCoreMock.getVariant.mockReturnValue('experimentA');
+        featureCoreMock.getVariant.mockReturnValue('experimentA');
 
         expect(_core.getVariant('context', 'experimentB')).toEqual(null);
-        expect(_featureCoreMock.getVariant.mock.calls.length).toEqual(1);
+        expect(featureCoreMock.getVariant.mock.calls.length).toEqual(1);
     });
 });

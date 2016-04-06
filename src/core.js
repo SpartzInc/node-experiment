@@ -1,13 +1,7 @@
 module.exports.setExperiments = setExperiments;
 module.exports.getVariant = getVariant;
 
-/**
- * Instance of feature
- *
- * @type {object}
- * @private
- */
-var _feature = require('@dose/feature');
+var feature = require('@dose/feature');
 
 /**
  * Stores configured feature object
@@ -15,7 +9,7 @@ var _feature = require('@dose/feature');
  * @type {object}
  * @private
  */
-var _experiments = _feature({});
+var _experiments = feature({});
 
 /**
  * Sets and parses configured experiments

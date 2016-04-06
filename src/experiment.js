@@ -1,6 +1,6 @@
 module.exports = experiment;
 
-var _core = require('./core');
+var core = require('./core');
 
 /**
  * Returns configured core object
@@ -9,7 +9,7 @@ var _core = require('./core');
  * @returns {object}
  */
 function experiment(config) {
-    _core.setExperiments(config);
+    core.setExperiments(config);
 
-    return _core;
+    return core;
 }
