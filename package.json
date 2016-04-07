@@ -25,7 +25,7 @@
         "cs": "jscs src/*.js tests/*.js"
     },
     "dependencies": {
-        "feature": "https://bitbucket.org/spartz/node-feature.git"
+        "feature": "https://bitbucket.org/spartz/node-feature.git#4fbdc6d"
     },
     "devDependencies": {
         "jest-cli": "0.10.0",
