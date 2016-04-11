@@ -88,8 +88,11 @@ function _getParsedExperimentConfig(experiments) {
  * @private
  */
 function _getSanitizedWeight(weight) {
-    if (isNaN(weight)) {
+    if (typeof weight === 'boolean') {
+        weight = weight ? 1 : 0;
+    } else if (typeof weight !== 'number' || isNaN(weight)) {
         return 0;
     }
+
     return weight < 0 ? 0 : weight;
 }
