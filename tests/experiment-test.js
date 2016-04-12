@@ -68,8 +68,20 @@ describe('experiment', function() {
 
     };
 
+    var _mockGetDigest = jest.fn();
+
+    _mockGetDigest.mockReturnValue({
+        experiments: 'experimentA',
+        'experiment.experimentA': 'variantA'
+    });
+
+    feature.mockReturnValue({
+        getDigest: _mockGetDigest
+    });
+
     beforeEach(function() {
         feature.mockClear();
+        _mockGetDigest.mockClear();
     });
 
     it('should export instantiated experiment object', function() {
@@ -113,19 +125,123 @@ describe('experiment', function() {
     });
 
     it('gets digest', function() {
-        feature.mockReturnValue({
-            getDigest: function() {
-                return {
-                    experiments: 'experimentA',
-                    'experiment.experimentA': 'variantA'
-                };
-            }
-        });
-
         var experiments = experiment(_experimentConfig);
 
         expect(experiments.getDigest('context')).toEqual({
             experimentA: 'variantA'
+        });
+    });
+
+    it('applies overrides in json format', function() {
+        var experiments = experiment(_experimentConfig);
+
+        experiments.getDigest('context', {234: 0});
+        experiments.getDigest('context', {234: 2});
+        experiments.getDigest('context', {234: -100});
+        experiments.getDigest('context', {234: 100});
+        experiments.getDigest('context', {234: null});
+        experiments.getDigest('context', [234]);
+
+        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+            experiments: 'experimentB',
+            'experiment.experimentB': 'variantA'
+        });
+        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+            experiments: 'experimentB',
+            'experiment.experimentB': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+            experiments: 'experimentB',
+            'experiment.experimentB': 'variantA'
+        });
+        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+            experiments: 'experimentB',
+            'experiment.experimentB': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[4][1]).toEqual({
+            experiments: 'experimentB'
+        });
+        expect(_mockGetDigest.mock.calls[5][1]).toEqual({
+            experiments: 'experimentB'
+        });
+    });
+
+    it('applies overrides in json string format', function() {
+        var experiments = experiment(_experimentConfig);
+
+        experiments.getDigest('context', JSON.stringify({345: 0}));
+        experiments.getDigest('context', JSON.stringify({345: 2}));
+        experiments.getDigest('context', JSON.stringify({345: -100}));
+        experiments.getDigest('context', JSON.stringify({345: 100}));
+        experiments.getDigest('context', JSON.stringify({345: null}));
+        experiments.getDigest('context', JSON.stringify([345]));
+
+        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantA'
+        });
+        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantA'
+        });
+        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[4][1]).toEqual({
+            experiments: 'experimentC'
+        });
+        expect(_mockGetDigest.mock.calls[5][1]).toEqual({
+            experiments: 'experimentC'
+        });
+    });
+
+    it('applies overrides in string format', function() {
+        var experiments = experiment(_experimentConfig);
+
+        experiments.getDigest('context', '345-0');
+        experiments.getDigest('context', '345-2');
+        experiments.getDigest('context', '345-100');
+        experiments.getDigest('context', '345');
+
+        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantA'
+        });
+        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantC'
+        });
+        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+            experiments: 'experimentC'
+        });
+    });
+
+    it('overrides experiments with 0 weight', function() {
+        var experiments = experiment(_experimentConfig);
+
+        experiments.getDigest('context', [567]);
+
+        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+            experiments: 'experimentE'
+        });
+    });
+
+    it('overrides all experiments to null if slug does not exist', function() {
+        var experiments = experiment(_experimentConfig);
+
+        experiments.getDigest('context', [73]);
+
+        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+            experiments: null
         });
     });
 });
