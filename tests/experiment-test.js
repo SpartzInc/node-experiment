@@ -8,12 +8,12 @@ describe('experiment', function() {
 
     var _experimentConfig = {
         experimentA: {
-            weight: 10,
+            weight: 1,
             variants: 100,
             slug: '123'
         },
         experimentB: {
-            weight: 10,
+            weight: 1,
             variants: [
                 'variantA',
                 'variantB',
@@ -22,7 +22,7 @@ describe('experiment', function() {
             slug: '234'
         },
         experimentC: {
-            weight: 20,
+            weight: 2,
             variants: {
                 variantA: 10,
                 variantB: 10,
@@ -50,7 +50,22 @@ describe('experiment', function() {
                 'variantA'
             ],
             slug: '789'
-        }
+        },
+        experimentG: {
+            weight: true,
+            variants: [
+                'variantA'
+            ],
+            slug: '890'
+        },
+        experimentH: {
+            weight: false,
+            variants: [
+                'variantA'
+            ],
+            slug: '901'
+        },
+
     };
 
     beforeEach(function() {
@@ -75,9 +90,10 @@ describe('experiment', function() {
 
         expect(feature.mock.calls[0][0]).toEqual({
             experiments: {
-                experimentA: 25,
-                experimentB: 25,
-                experimentC: 100
+                experimentA: 20,
+                experimentB: 20,
+                experimentC: 40,
+                experimentG: 100
             },
             'experiment.experimentA': 100,
             'experiment.experimentB': [
@@ -90,6 +106,9 @@ describe('experiment', function() {
                 variantB: 10,
                 variantC: 20
             },
+            'experiment.experimentG': [
+                'variantA'
+            ]
         });
     });
 
