@@ -64,41 +64,26 @@ describe('experiment', function() {
                 'variantA'
             ],
             slug: '901'
-        },
-
+        }
     };
 
-    var _mockGetDigest = jest.fn();
-
-    _mockGetDigest.mockReturnValue({
+    feature.mockReturnValue({
         experiments: 'experimentA',
         'experiment.experimentA': 'variantA'
     });
 
-    feature.mockReturnValue({
-        getDigest: _mockGetDigest
-    });
-
     beforeEach(function() {
         feature.mockClear();
-        _mockGetDigest.mockClear();
-    });
-
-    it('should export instantiated experiment object', function() {
-        var experiments = experiment({});
-
-        expect(typeof experiments).toEqual('object');
-        expect(typeof experiments.getDigest).toEqual('function');
     });
 
     it('throws an error when configuration is invalid', function() {
         expect(function() {
-            experiment('Not and Object');
+            experiment('Not and Object', 'context');
         }).toThrow();
     });
 
     it('sets feature configuration', function() {
-        experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context');
 
         expect(feature.mock.calls[0][0]).toEqual({
             experiments: {
@@ -125,123 +110,119 @@ describe('experiment', function() {
     });
 
     it('gets digest', function() {
-        var experiments = experiment(_experimentConfig);
-
-        expect(experiments.getDigest('context')).toEqual({
+        expect(experiment(_experimentConfig, 'context')).toEqual({
             experimentA: 'variantA'
         });
     });
 
     it('applies overrides in json format', function() {
-        var experiments = experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context', {234: 0});
+        experiment(_experimentConfig, 'context', {234: 2});
+        experiment(_experimentConfig, 'context', {234: -100});
+        experiment(_experimentConfig, 'context', {234: 100});
+        experiment(_experimentConfig, 'context', {234: null});
+        experiment(_experimentConfig, 'context', [234]);
 
-        experiments.getDigest('context', {234: 0});
-        experiments.getDigest('context', {234: 2});
-        experiments.getDigest('context', {234: -100});
-        experiments.getDigest('context', {234: 100});
-        experiments.getDigest('context', {234: null});
-        experiments.getDigest('context', [234]);
-
-        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+        expect(feature.mock.calls[0][2]).toEqual({
             experiments: 'experimentB',
             'experiment.experimentB': 'variantA'
         });
-        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+        expect(feature.mock.calls[1][2]).toEqual({
             experiments: 'experimentB',
             'experiment.experimentB': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+        expect(feature.mock.calls[2][2]).toEqual({
             experiments: 'experimentB',
             'experiment.experimentB': 'variantA'
         });
-        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+        expect(feature.mock.calls[3][2]).toEqual({
             experiments: 'experimentB',
             'experiment.experimentB': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[4][1]).toEqual({
+        expect(feature.mock.calls[4][2]).toEqual({
             experiments: 'experimentB'
         });
-        expect(_mockGetDigest.mock.calls[5][1]).toEqual({
+        expect(feature.mock.calls[5][2]).toEqual({
             experiments: 'experimentB'
         });
     });
 
     it('applies overrides in json string format', function() {
-        var experiments = experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context', JSON.stringify({345: 0}));
+        experiment(_experimentConfig, 'context', JSON.stringify({345: 2}));
+        experiment(_experimentConfig, 'context', JSON.stringify({345: -100}));
+        experiment(_experimentConfig, 'context', JSON.stringify({345: 100}));
+        experiment(_experimentConfig, 'context', JSON.stringify({345: null}));
+        experiment(_experimentConfig, 'context', JSON.stringify([345]));
 
-        experiments.getDigest('context', JSON.stringify({345: 0}));
-        experiments.getDigest('context', JSON.stringify({345: 2}));
-        experiments.getDigest('context', JSON.stringify({345: -100}));
-        experiments.getDigest('context', JSON.stringify({345: 100}));
-        experiments.getDigest('context', JSON.stringify({345: null}));
-        experiments.getDigest('context', JSON.stringify([345]));
-
-        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+        expect(feature.mock.calls[0][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
         });
-        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+        expect(feature.mock.calls[1][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+        expect(feature.mock.calls[2][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
         });
-        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+        expect(feature.mock.calls[3][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[4][1]).toEqual({
+        expect(feature.mock.calls[4][2]).toEqual({
             experiments: 'experimentC'
         });
-        expect(_mockGetDigest.mock.calls[5][1]).toEqual({
+        expect(feature.mock.calls[5][2]).toEqual({
             experiments: 'experimentC'
         });
     });
 
     it('applies overrides in string format', function() {
-        var experiments = experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context', '345-0');
+        experiment(_experimentConfig, 'context', '345-2');
+        experiment(_experimentConfig, 'context', '345-100');
+        experiment(_experimentConfig, 'context', '345');
 
-        experiments.getDigest('context', '345-0');
-        experiments.getDigest('context', '345-2');
-        experiments.getDigest('context', '345-100');
-        experiments.getDigest('context', '345');
-
-        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+        expect(feature.mock.calls[0][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
         });
-        expect(_mockGetDigest.mock.calls[1][1]).toEqual({
+        expect(feature.mock.calls[1][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[2][1]).toEqual({
+        expect(feature.mock.calls[2][2]).toEqual({
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
         });
-        expect(_mockGetDigest.mock.calls[3][1]).toEqual({
+        expect(feature.mock.calls[3][2]).toEqual({
             experiments: 'experimentC'
         });
     });
 
     it('overrides experiments with 0 weight', function() {
-        var experiments = experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context', [567]);
 
-        experiments.getDigest('context', [567]);
-
-        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+        expect(feature.mock.calls[0][2]).toEqual({
             experiments: 'experimentE'
         });
     });
 
     it('overrides all experiments to null if slug does not exist', function() {
-        var experiments = experiment(_experimentConfig);
+        experiment(_experimentConfig, 'context', [73]);
 
-        experiments.getDigest('context', [73]);
-
-        expect(_mockGetDigest.mock.calls[0][1]).toEqual({
+        expect(feature.mock.calls[0][2]).toEqual({
             experiments: null
+        });
+    });
+
+    it('does not try to complete coverage when there are no experiments', function() {
+        experiment({}, 'context');
+
+        expect(feature.mock.calls[0][0]).toEqual({
+            experiments: {}
         });
     });
 });
