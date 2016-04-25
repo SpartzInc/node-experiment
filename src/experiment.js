@@ -152,7 +152,7 @@ function _getParsedOverride(override, slugMap) {
 
     if (
         variant !== null &&
-        variant !== 'undefined' &&
+        variant !== undefined &&
         slugMap[slug].variants.length
     ) {
         variant = Math.min(slugMap[slug].variants.length - 1, variant);

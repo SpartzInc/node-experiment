@@ -1,6 +1,6 @@
 {
     "name": "node-experiment",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Experiment is a decoration wrapper for our Feature module.",
     "license": "MIT",
     "keywords": [
@@ -28,6 +28,7 @@
         "node-feature": "1.0.1"
     },
     "devDependencies": {
+        "lodash": "4.11.1",
         "jest-cli": "0.10.0",
         "jshint": "2.9.1",
         "jscs": "2.11.0"
