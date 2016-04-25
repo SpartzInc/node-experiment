@@ -2,6 +2,7 @@ jest.dontMock('../src/experiment');
 jest.mock('node-feature');
 
 describe('experiment', function() {
+    var _ = require('lodash');
 
     var experiment = require('../src/experiment');
     var feature = require('node-feature');
@@ -85,7 +86,7 @@ describe('experiment', function() {
     it('sets feature configuration', function() {
         experiment(_experimentConfig, 'context');
 
-        expect(feature.mock.calls[0][0]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][0], {
             experiments: {
                 experimentA: 20,
                 experimentB: 20,
@@ -106,13 +107,13 @@ describe('experiment', function() {
             'experiment.experimentG': [
                 'variantA'
             ]
-        });
+        })).toBeTruthy();
     });
 
     it('gets digest', function() {
-        expect(experiment(_experimentConfig, 'context')).toEqual({
+        expect(_.isEqual(experiment(_experimentConfig, 'context'), {
             experimentA: 'variantA'
-        });
+        })).toBeTruthy();
     });
 
     it('applies overrides in json format', function() {
@@ -123,28 +124,28 @@ describe('experiment', function() {
         experiment(_experimentConfig, 'context', {234: null});
         experiment(_experimentConfig, 'context', [234]);
 
-        expect(feature.mock.calls[0][2]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][2], {
             experiments: 'experimentB',
             'experiment.experimentB': 'variantA'
-        });
-        expect(feature.mock.calls[1][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[1][2], {
             experiments: 'experimentB',
             'experiment.experimentB': 'variantC'
-        });
-        expect(feature.mock.calls[2][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[2][2], {
             experiments: 'experimentB',
             'experiment.experimentB': 'variantA'
-        });
-        expect(feature.mock.calls[3][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[3][2], {
             experiments: 'experimentB',
             'experiment.experimentB': 'variantC'
-        });
-        expect(feature.mock.calls[4][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[4][2], {
             experiments: 'experimentB'
-        });
-        expect(feature.mock.calls[5][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[5][2], {
             experiments: 'experimentB'
-        });
+        })).toBeTruthy();
     });
 
     it('applies overrides in json string format', function() {
@@ -155,28 +156,28 @@ describe('experiment', function() {
         experiment(_experimentConfig, 'context', JSON.stringify({345: null}));
         experiment(_experimentConfig, 'context', JSON.stringify([345]));
 
-        expect(feature.mock.calls[0][2]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
-        });
-        expect(feature.mock.calls[1][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[1][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
-        });
-        expect(feature.mock.calls[2][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[2][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
-        });
-        expect(feature.mock.calls[3][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[3][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
-        });
-        expect(feature.mock.calls[4][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[4][2], {
             experiments: 'experimentC'
-        });
-        expect(feature.mock.calls[5][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[5][2], {
             experiments: 'experimentC'
-        });
+        })).toBeTruthy();
     });
 
     it('applies overrides in string format', function() {
@@ -185,44 +186,44 @@ describe('experiment', function() {
         experiment(_experimentConfig, 'context', '345-100');
         experiment(_experimentConfig, 'context', '345');
 
-        expect(feature.mock.calls[0][2]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantA'
-        });
-        expect(feature.mock.calls[1][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[1][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
-        });
-        expect(feature.mock.calls[2][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[2][2], {
             experiments: 'experimentC',
             'experiment.experimentC': 'variantC'
-        });
-        expect(feature.mock.calls[3][2]).toEqual({
+        })).toBeTruthy();
+        expect(_.isEqual(feature.mock.calls[3][2], {
             experiments: 'experimentC'
-        });
+        })).toBeTruthy();
     });
 
     it('overrides experiments with 0 weight', function() {
         experiment(_experimentConfig, 'context', [567]);
 
-        expect(feature.mock.calls[0][2]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][2], {
             experiments: 'experimentE'
-        });
+        })).toBeTruthy();
     });
 
     it('overrides all experiments to null if slug does not exist', function() {
         experiment(_experimentConfig, 'context', [73]);
 
-        expect(feature.mock.calls[0][2]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][2], {
             experiments: null
-        });
+        })).toBeTruthy();
     });
 
     it('does not try to complete coverage when there are no experiments', function() {
         experiment({}, 'context');
 
-        expect(feature.mock.calls[0][0]).toEqual({
+        expect(_.isEqual(feature.mock.calls[0][0], {
             experiments: {}
-        });
+        })).toBeTruthy();
     });
 });
