@@ -1,6 +1,6 @@
 {
-    "name": "@dose/experiment",
-    "version": "1.0.0",
+    "name": "node-experiment",
+    "version": "1.0.1",
     "description": "Experiment is a decoration wrapper for our Feature module.",
     "license": "MIT",
     "keywords": [
@@ -15,7 +15,7 @@
     "repository" :
     {
         "type": "git",
-        "url": "https://bitbucket.org/spartz/node-experiment.git"
+        "url": "https://github.com/SpartzInc/node-experiment.git"
     },
     "main": "src/experiment.js",
     "scripts": {
@@ -25,7 +25,7 @@
         "cs": "jscs src/*.js tests/*.js"
     },
     "dependencies": {
-        "feature": "https://bitbucket.org/spartz/node-feature.git"
+        "node-feature": "1.0.1"
     },
     "devDependencies": {
         "jest-cli": "0.10.0",
