@@ -1,6 +1,6 @@
 module.exports = experiment;
 
-var feature = require('@dose/feature');
+var feature = require('node-feature');
 
 /**
  * Get a configured experiments object that exposes getDigest function

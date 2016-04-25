@@ -1,10 +1,10 @@
 jest.dontMock('../src/experiment');
-jest.mock('@dose/feature');
+jest.mock('node-feature');
 
 describe('experiment', function() {
 
     var experiment = require('../src/experiment');
-    var feature = require('@dose/feature');
+    var feature = require('node-feature');
 
     var _experimentConfig = {
         experimentA: {
