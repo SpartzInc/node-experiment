@@ -110,9 +110,40 @@ describe('experiment', function() {
         })).toBeTruthy();
     });
 
-    it('gets digest', function() {
+    it('gets digest and slug from simple variant', function() {
         expect(_.isEqual(experiment(_experimentConfig, 'context'), {
-            experimentA: 'variantA'
+            digest: {
+                experimentA: 'variantA'
+            },
+            slug: '123-1'
+        })).toBeTruthy();
+    });
+
+    it('gets a slug from variant array', function() {
+        feature.mockReturnValue({
+            experiments: 'experimentB',
+            'experiment.experimentB': 'variantC'
+        });
+
+        expect(_.isEqual(experiment(_experimentConfig, 'context'), {
+            digest: {
+                experimentB: 'variantC'
+            },
+            slug: '234-3'
+        })).toBeTruthy();
+    });
+
+    it('gets a slug from variant object', function() {
+        feature.mockReturnValue({
+            experiments: 'experimentC',
+            'experiment.experimentC': 'variantB'
+        });
+
+        expect(_.isEqual(experiment(_experimentConfig, 'context'), {
+            digest: {
+                experimentC: 'variantB'
+            },
+            slug: '345-2'
         })).toBeTruthy();
     });
 
