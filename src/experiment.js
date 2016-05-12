@@ -1,9 +1,11 @@
 module.exports = experiment;
 
+var _ = require('lodash');
 var feature = require('node-feature');
 
 /**
- * Get a configured experiments object that exposes getDigest function
+ * Gets an object containing experiment digest and slug. Digest is an object containing experiment name as key and
+ * a single winning variant as the value.
  *
  * @param {object} experiments
  * @param {string} context
@@ -11,7 +13,7 @@ var feature = require('node-feature');
  * @returns {object}
  */
 function experiment(experiments, context, override) {
-    if (typeof experiments !== 'object') {
+    if (!_.isObject(experiments)) {
         throw Error('Invalid configuration');
     }
 
@@ -25,7 +27,12 @@ function experiment(experiments, context, override) {
 
     experimentDigest[digest.experiments] = digest['experiment.' + digest.experiments];
 
-    return experimentDigest;
+    var slug = _getExperimentSlugFromDigest(experimentDigest, experiments);
+
+    return {
+        digest: experimentDigest,
+        slug: slug
+    };
 }
 
 /**
@@ -63,7 +70,7 @@ function _getParsedExperimentConfig(experiments) {
     }
 
     // Make last experiment 100 to ensure complete coverage
-    if (Object.keys(parsedExperiments.experiments).length) {
+    if (_.keys(parsedExperiments.experiments).length) {
         parsedExperiments.experiments[experiment] = 100;
     }
 
@@ -83,11 +90,11 @@ function _getParsedSlugMap(experiments) {
 
     // Parse important data from the experiment configuration
     for (var experiment in experiments) {
-        variants = experiments[experiment].variants;
+        variants = _.cloneDeep(experiments[experiment].variants);
 
-        if (typeof variants === 'object') {
-            if (!Array.isArray(variants)) {
-                variants = Object.keys(variants);
+        if (_.isObject(variants)) {
+            if (!_.isArray(variants)) {
+                variants = _.keys(variants);
             }
         } else {
             variants = [];
@@ -123,24 +130,24 @@ function _getParsedOverride(override, slugMap) {
         parsedOverride = override;
     }
 
-    if (typeof parsedOverride !== 'object') {
+    if (!_.isObject(parsedOverride)) {
         var overrideParts = override.toString().split('-');
         parsedOverride = {};
-        parsedOverride[overrideParts[0]] = overrideParts[1];
+        parsedOverride[_.first(overrideParts)] = _.nth(overrideParts, 1);
     }
 
     var slug;
     var variant;
 
-    if (Array.isArray(parsedOverride)) {
-        slug = parsedOverride[0];
+    if (_.isArray(parsedOverride)) {
+        slug = _.first(parsedOverride);
     } else {
-        slug = Object.keys(parsedOverride)[0];
+        slug = _.first(_.keys(parsedOverride));
         variant = parsedOverride[slug];
     }
 
     // Turn off all experiments if slug is not found
-    if (!slugMap.hasOwnProperty(slug)) {
+    if (!_.has(slugMap, slug)) {
         return {
             experiments: null
         };
@@ -151,17 +158,50 @@ function _getParsedOverride(override, slugMap) {
     };
 
     if (
-        variant !== null &&
-        variant !== undefined &&
+        !_.isNil(variant) &&
         slugMap[slug].variants.length
     ) {
-        variant = Math.min(slugMap[slug].variants.length - 1, variant);
-        variant = Math.max(0, variant);
+        variant = _.min([slugMap[slug].variants.length - 1, variant]);
+        variant = _.max([0, variant]);
 
-        translatedOverride['experiment.' + slugMap[slug].name] = slugMap[slug].variants[variant];
+        translatedOverride['experiment.' + slugMap[slug].name] = _.nth(slugMap[slug].variants, variant);
     }
 
     return translatedOverride;
+}
+
+/**
+ * Translates experiment digest into slug string.
+ *
+ * @param {object} digest
+ * @param {object} experiments
+ * @returns {string}
+ * @private
+ */
+function _getExperimentSlugFromDigest(digest, experiments) {
+    var experiment = _.first(_.keys(digest));
+
+    if (_.isUndefined(experiment) || !_.has(experiments, experiment)) {
+        return '';
+    }
+
+    var slug = experiments[experiment].slug;
+    var variant = digest[experiment];
+    var variants = _.cloneDeep(experiments[experiment].variants);
+
+    if (_.isObject(variants)) {
+        if (!_.isArray(variants)) {
+            variants = _.keys(variants);
+        }
+    } else {
+        variants = [];
+    }
+
+    var variantIndex = variants.indexOf(variant);
+    variantIndex = variantIndex < 0 ? 0 : variantIndex;
+    variantIndex++;
+
+    return slug + '-' + variantIndex;
 }
 
 /**
@@ -172,9 +212,9 @@ function _getParsedOverride(override, slugMap) {
  * @private
  */
 function _getSanitizedWeight(weight) {
-    if (typeof weight === 'boolean') {
+    if (_.isBoolean(weight)) {
         weight = weight ? 1 : 0;
-    } else if (typeof weight !== 'number' || isNaN(weight)) {
+    } else if (!_.isFinite(weight)) {
         return 0;
     }
 

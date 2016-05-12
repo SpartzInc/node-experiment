@@ -25,13 +25,13 @@
         "cs": "jscs src/*.js tests/*.js"
     },
     "dependencies": {
+        "lodash": "4.12.0",
         "node-feature": "1.0.1"
     },
     "devDependencies": {
-        "lodash": "4.11.1",
-        "jest-cli": "0.10.0",
-        "jshint": "2.9.1",
-        "jscs": "2.11.0"
+        "jest-cli": "12.0.2",
+        "jshint": "2.9.2",
+        "jscs": "3.0.3"
     },
     "jest": {
         "testDirectoryName": "tests",
