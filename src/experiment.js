@@ -7,27 +7,27 @@ var feature = require('node-feature');
  * Gets an object containing experiment digest and slug. Digest is an object containing experiment name as key and
  * a single winning variant as the value.
  *
- * @param {object} experiments
+ * @param {object} experimentsConfig
  * @param {string} context
  * @param {object|string} [override]
  * @returns {object}
  */
-function experiment(experiments, context, override) {
-    if (!_.isObject(experiments)) {
+function experiment(experimentsConfig, context, override) {
+    if (!_.isObject(experimentsConfig)) {
         throw Error('Invalid configuration');
     }
 
     var digest = feature(
-        _getParsedExperimentConfig(experiments),
+        _getParsedExperimentConfig(experimentsConfig),
         context,
-        _getParsedOverride(override, _getParsedSlugMap(experiments))
+        _getParsedOverride(override, _getParsedSlugMap(experimentsConfig))
     );
 
     var experimentDigest = {};
 
     experimentDigest[digest.experiments] = digest['experiment.' + digest.experiments];
 
-    var slug = _getExperimentSlugFromDigest(experimentDigest, experiments);
+    var slug = _getExperimentSlugFromDigest(experimentDigest, experimentsConfig);
 
     return {
         digest: experimentDigest,
@@ -38,11 +38,11 @@ function experiment(experiments, context, override) {
 /**
  * Gets parsed experiments configuration
  *
- * @param {object} experiments
+ * @param {object} experimentsConfig
  * @returns {object}
  * @private
  */
-function _getParsedExperimentConfig(experiments) {
+function _getParsedExperimentConfig(experimentsConfig) {
     var experiment;
     var experimentWeight;
     var totalWeight = 0;
@@ -51,8 +51,8 @@ function _getParsedExperimentConfig(experiments) {
     };
 
     // Parse important data from the experiment configuration
-    for (experiment in experiments) {
-        experimentWeight = _getSanitizedWeight(experiments[experiment].weight);
+    for (experiment in experimentsConfig) {
+        experimentWeight = _getSanitizedWeight(experimentsConfig[experiment].weight);
 
         // Ignore 0 weight experiments
         if (experimentWeight === 0) {
@@ -61,7 +61,7 @@ function _getParsedExperimentConfig(experiments) {
 
         totalWeight += experimentWeight;
         parsedExperiments.experiments[experiment] = experimentWeight;
-        parsedExperiments['experiment.' + experiment] = experiments[experiment].variants;
+        parsedExperiments['experiment.' + experiment] = experimentsConfig[experiment].variants;
     }
 
     // Convert weights into odds
@@ -80,17 +80,17 @@ function _getParsedExperimentConfig(experiments) {
 /**
  * Gets parsed slug map
  *
- * @param {object} experiments
+ * @param {object} experimentsConfig
  * @returns {object}
  * @private
  */
-function _getParsedSlugMap(experiments) {
+function _getParsedSlugMap(experimentsConfig) {
     var slugMap = {};
     var variants;
 
     // Parse important data from the experiment configuration
-    for (var experiment in experiments) {
-        variants = _.cloneDeep(experiments[experiment].variants);
+    for (var experiment in experimentsConfig) {
+        variants = _.cloneDeep(experimentsConfig[experiment].variants);
 
         if (_.isObject(variants)) {
             if (!_.isArray(variants)) {
@@ -100,7 +100,7 @@ function _getParsedSlugMap(experiments) {
             variants = [];
         }
 
-        slugMap[experiments[experiment].slug] = {
+        slugMap[experimentsConfig[experiment].slug] = {
             name: experiment,
             variants: variants
         };
@@ -174,20 +174,20 @@ function _getParsedOverride(override, slugMap) {
  * Translates experiment digest into slug string.
  *
  * @param {object} digest
- * @param {object} experiments
+ * @param {object} experimentsConfig
  * @returns {string}
  * @private
  */
-function _getExperimentSlugFromDigest(digest, experiments) {
-    var experiment = _.first(_.keys(digest));
+function _getExperimentSlugFromDigest(digest, experimentsConfig) {
+    var activeExperiment = _.first(_.keys(digest));
 
-    if (_.isUndefined(experiment) || !_.has(experiments, experiment)) {
+    if (_.isUndefined(activeExperiment) || !_.has(experimentsConfig, activeExperiment)) {
         return '';
     }
 
-    var slug = experiments[experiment].slug;
-    var variant = digest[experiment];
-    var variants = _.cloneDeep(experiments[experiment].variants);
+    var slug = experimentsConfig[activeExperiment].slug;
+    var variant = digest[activeExperiment];
+    var variants = _.cloneDeep(experimentsConfig[activeExperiment].variants);
 
     if (_.isObject(variants)) {
         if (!_.isArray(variants)) {
